@@ -14,7 +14,8 @@
     owner: "{{ user.username }}"
     group: "{{ user.group if user.group is defined else (users_group.name if users_group else user.username) }}"
     state: directory
-    mode: "0700"
+    mode: "{{ user.ssh_dir_mode if user.ssh_dir_mode is defined else users_ssh_dir_mode }}"
+  when: user.ssh_dir_create if user.ssh_dir_create is defined else users_ssh_dir_create
 
 - name: Adding user's private SSH key
   ansible.builtin.copy:
@@ -41,6 +42,7 @@
     key: "{{ user.authorized_keys | default([]) | join('\n') }}"
     user: "{{ user.username }}"
     exclusive: "{{ user.authorized_keys_exclusive | default(users_authorized_keys_exclusive) }}"
+    manage_dir: false
   ignore_errors: "{{ ansible_check_mode }}"
 
 - name: Adding user's home files

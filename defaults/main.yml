@@ -22,6 +22,8 @@
 #       - "xxx"
 #       - "{{ lookup('file', '/path/to/id_rsa.pub') }}"
 #     authorized_keys_exclusive: yes
+#     ssh_dir_create: yes
+#     ssh_dir_mode: "0700"
 #     ssh_key_type: rsa
 #     ssh_key_bits: 2048
 #     ssh_key_password: ""
@@ -57,6 +59,10 @@ users_groups: []
 users_home_mode: "0755"
 # default user login shell
 # users_shell:
+# create user's .ssh directory
+users_ssh_dir_create: true
+# default user's .ssh directory permissions
+users_ssh_dir_mode: "0700"
 # default user's ssh key type
 users_ssh_key_type: rsa
 # default user's ssh key bits

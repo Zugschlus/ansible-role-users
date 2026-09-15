@@ -11,7 +11,38 @@
   ansible.builtin.set_fact:
     user_exists_before: "{{ passwd_getent is defined and passwd_getent.ansible_facts.getent_passwd[user.username] is defined }}"
 
-- name: "Adding user to the system: {{ user.username }}"
+- name: "Adding user to the system without ssh key: {{ user.username }}"
+  ansible.builtin.user:
+    name: "{{ user.username }}"
+    uid: "{{ user.uid | default(omit) }}"
+    home: "{{ user.home | default(users_home ~ '/' ~ user.username) }}"
+    comment: "{{ user.name | default(omit) }}"
+    system: "{{ user.system | default(omit) }}"
+    generate_ssh_key: false
+    group: "{{
+            omit if user.group is defined and user.group == user.username
+            else (user.group if user.group is defined else (users_group.name if users_group else omit))
+            }}"
+    groups: "{{ user.groups | join(',') if user.groups is defined else users_groups | map(attribute='name') | join(',') }}"
+    append: "{{ user.append | default(omit) }}"
+    password: "{{ user.password | default(omit) }}"
+    shell: "{{ user.shell | default(users_shell | default(omit)) }}"
+    update_password: "{{ user.update_password | default(omit) }}"
+  when: >
+    (
+      (user.user_update | default(users_user_update) ) == "always" or
+      (
+        (user.user_update | default(users_user_update) ) == "on_create" and
+        not user_exists_before
+      )
+    )
+    and (user.user_create | default(users_user_create) | bool)
+
+- name: Configuring user's home
+  ansible.builtin.import_tasks: manage_user_home.yml
+  when: user.home_create | default(users_home_create) | bool
+
+- name: "Creating ssh key by repeating the create process: {{ user.username }}"
   ansible.builtin.user:
     name: "{{ user.username }}"
     uid: "{{ user.uid | default(omit) }}"
@@ -41,7 +72,3 @@
       )
     )
     and (user.user_create | default(users_user_create) | bool)
-
-- name: Configuring user's home
-  ansible.builtin.import_tasks: manage_user_home.yml
-  when: user.home_create | default(users_home_create) | bool

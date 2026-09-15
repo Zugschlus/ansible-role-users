@@ -67,6 +67,8 @@ Here is a list of all the default variables for this role, which are also availa
 #       - "xxx"
 #       - "{{ lookup('file', '/path/to/id_rsa.pub') }}"
 #     authorized_keys_exclusive: yes
+#     ssh_dir_create: yes
+#     ssh_dir_mode: "0700"
 #     ssh_key_type: rsa
 #     ssh_key_bits: 2048
 #     ssh_key_password: ""
@@ -101,7 +103,11 @@ users_groups: []
 # default user's home directory permissions
 users_home_mode: "0755"
 # default user login shell
-#users_shell:
+#users_shell
+# create user's .ssh directory
+users_ssh_dir_create: yes
+# default user's .ssh directory permissions
+users_ssh_dir_mode: "0700"
 # default user's ssh key type
 users_ssh_key_type: rsa
 # default user's ssh key bits

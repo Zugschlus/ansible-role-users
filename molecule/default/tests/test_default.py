@@ -22,6 +22,20 @@ def test_ssh_directory(host):
     assert ssh_dir.mode == 0o700
 
 
+def test_ssh_directory_755(host):
+    """Verify .ssh directory exists with correct permissions."""
+    ssh_dir = host.file('/home/testuser0755/.ssh')
+    assert ssh_dir.exists
+    assert ssh_dir.is_directory
+    assert ssh_dir.mode == 0o755
+
+
+def test_ssh_directory_not(host):
+    """Verify .ssh directory does not exist."""
+    ssh_dir = host.file('/home/testusernossh/.ssh')
+    assert not (ssh_dir.exists)
+
+
 def test_authorized_keys(host):
     """Verify authorized_keys file contains the test key."""
     auth_keys = host.file('/home/testuser/.ssh/authorized_keys')
@@ -32,6 +46,20 @@ def test_authorized_keys(host):
 def test_ssh_key_generated(host):
     """Verify SSH key pair was generated."""
     key = host.file('/home/testuser/.ssh/id_ed25519')
+    assert key.exists
+    assert key.mode == 0o600
+
+
+def test_authorized_keys_0755(host):
+    """Verify authorized_keys file contains the test key."""
+    auth_keys = host.file('/home/testuser0755/.ssh/authorized_keys')
+    assert auth_keys.exists
+    assert auth_keys.contains('testuser0755@molecule')
+
+
+def test_ssh_key_generated_0755(host):
+    """Verify SSH key pair was generated."""
+    key = host.file('/home/testuser0755/.ssh/id_ed25519')
     assert key.exists
     assert key.mode == 0o600
 
